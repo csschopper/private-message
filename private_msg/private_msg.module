@@ -1,0 +1,402 @@
+<?php
+
+function private_msg_menu(){
+    
+    $items['user-inbox/messages'] = array(        //  Display Inbox Pages.
+        'title' => 'Inbox Messages',
+        'page callback' => 'private_msg_inboxpages', // Note this is the PAGE CALLBACK!
+        'access arguments' => array('rate content'),
+        'file' => 'private_msg_inbox.inc',
+        'type' => MENU_CALLBACK,
+    );
+    
+    $items['user-sent/messages'] = array(             ////  Display sent Pages.
+        'title' => 'Sent Messages',
+        'page callback' => 'private_msg_sentpages', // Note this is the PAGE CALLBACK!
+        'access arguments' => array('rate content'),
+         'file' => 'private_msg_sent.inc',
+          'type' => MENU_CALLBACK,
+    );
+   
+    $items['user-draft/messages'] = array(          ////  Display draft Pages.
+        'title' => 'Draft Messages',
+        'page callback' => 'private_msg_draftpages', // Note this is the PAGE CALLBACK!
+        'access arguments' => array('rate content'),
+        'file' => 'private_msg_draft.inc',
+         'type' => MENU_CALLBACK,
+    );
+    $items['user-favorite/messages'] = array(          ////  Display draft Pages.
+        'title' => 'Favorite Messages',
+        'page callback' => 'private_msg_favorite', // Note this is the PAGE CALLBACK!
+        'access arguments' => array('rate content'),
+        'file' => 'private_msg_favorite.inc',
+         'type' => MENU_CALLBACK,
+    );
+    
+//   $items['user-edit/%/messages'] = array(          //////  Display draft Pages.
+//        'title' => 'Draft Messages',
+//        'page callback' => 'private_msg_editdraft', // Note this is the PAGE CALLBACK!
+//        'access arguments' => array('rate content'),
+//        'page arguments' => array(1),
+//        'file' => 'private_msg_draft.inc',
+//         'type' => MENU_CALLBACK,
+//    );
+    
+    $items['user-draft/send/%'] = array(          //////  send draft messages Pages.
+        'title' => 'Draft Messages',
+        'page callback' => 'private_msg_senddraft', // Note this is the PAGE CALLBACK!
+        'access arguments' => array('rate content'),
+        'page arguments' => array(2),
+        'file' => 'private_msg_draft.inc',
+         'type' => MENU_CALLBACK,
+    );
+    
+ //==================== Delete draft,inbox,sent messages Pages. =============================//    
+    
+    $items['user-inbox/send/%/%'] = array(          //////  Delete draft messages Pages.
+        'title' => 'Draft Messages',
+        'page callback' => 'private_msg_deletedraft', // Note this is the PAGE CALLBACK!
+        'access arguments' => array('rate content'),
+        'page arguments' => array(2,3),
+        'file' => 'private_msg_draft.inc',
+         'type' => MENU_CALLBACK,
+    );
+ //==================== write new messages on single page =============================//    
+    $items['user-write/new/messages'] = array(
+        'title' => 'Write New Messages',
+        'page callback' => 'private_msg_writenew', // Note this is the PAGE CALLBACK!
+        'access arguments' => array('rate content'),
+        'file' => 'private_msg_draft.inc',
+         'type' => MENU_CALLBACK,
+    );
+ //==================== Search pages =============================//   
+    $items['user-inbox-message/results'] = array(
+        'title' => 'Find User Messages',
+        'page callback' => 'private_msg_inboxsearch_pages', // Note this is the PAGE CALLBACK!
+        'access arguments' => array('rate content'),
+        'file' => 'private_msg_search.inc',
+        'type' => MENU_CALLBACK,
+    );
+    $items['user-sent-message/results'] = array(
+        'title' => 'Find User Messages',
+        'page callback' => 'private_msg_sentsearch_pages', // Note this is the PAGE CALLBACK!
+        'access arguments' => array('rate content'),
+        'file' => 'private_msg_search.inc',
+        'type' => MENU_CALLBACK,
+    );
+    $items['user-draft-message/results'] = array(
+        'title' => 'Find User Messages',
+        'page callback' => 'private_msg_draftsearch_pages', // Note this is the PAGE CALLBACK!
+        'access arguments' => array('rate content'),
+        'file' => 'private_msg_search.inc',
+        'type' => MENU_CALLBACK,
+    );
+    $items['user-favorite-message/results'] = array(
+        'title' => 'Find User Messages',
+        'page callback' => 'private_msg_favoritesearch_pages', // Note this is the PAGE CALLBACK!
+        'access arguments' => array('rate content'),
+        'file' => 'private_msg_search.inc',
+        'type' => MENU_CALLBACK,
+    );
+//==================== view messages on single page =============================//   
+    $items['user-view/messages/%/%'] = array(
+        'title' => 'Read User Messages',
+        'page callback' => 'private_msg_readpages', // Note this is the PAGE CALLBACK!
+        'page arguments' => array(2,3),
+        'access callback' => TRUE,
+        'access arguments' => array('rate content'),
+        'type' => MENU_CALLBACK,
+    );
+    
+ //============= auto complete fields =============================//
+   
+    $items['customize/user/autocomplete'] = array(
+        'title' => 'Autocomplete for users',
+        'page callback' => '_users_autocomplete',
+        'access arguments' => array('rate content'),
+        'type' => MENU_CALLBACK,
+    );
+    
+ //============= Message will move Faviorite section =============================//
+   
+    $items['customize/message/favorite/%'] = array(
+        'title' => 'Move Messages to Favorite',
+        'page callback' => '_private_msg_move_favorite_message', // Note this is the PAGE CALLBACK!
+        'page arguments' => array(3),
+        'access callback' => TRUE,
+        'access arguments' => array('rate content'),
+        'type' => MENU_CALLBACK,
+    );
+    
+   return $items;
+}
+
+/**
+ * Implement hook_block_info()
+ */
+function private_msg_block_info() {
+   
+  // set up an empty array which will contain the block contents
+  $blocks = array();
+  // Generate listing of blocks from this module, for the admin/block page
+  
+  $blocks['messages_menu'] = array('info' => t('Messages Menu')); /*user-inbox/messages
+user-sent/messages
+user-draft/messages
+user-edit/* /messages
+user-write/new/messages
+user-message/results
+user-message/view   pages */
+  
+  $blocks['sent_messages_form'] = array('info' => t('Sent Messages')); // user-message/results and user-message/view/*  pages
+  
+  $blocks['search_messages_form'] = array('info' => t('Search Messages')); //user-inbox/messages and user-sent/messages and user-draft/messages and user-message/results  pages
+
+  
+  return $blocks;
+}
+ /**
+* Implement hook_block_view()
+*
+* Generate HTML for the buddies block
+* @param op the operation from the URL
+* @param delta offset
+* @returns block HTML
+*/
+function private_msg_block_view($delta = '') {
+
+    global $user;
+	$block = array();
+	
+	switch ($delta) {
+		case 'messages_menu':
+                        module_load_include('inc', 'private_msg', 'private_msg_blockdata');
+			$block['subject'] = t('');
+			$block['content'] = private_msg_messages_menu();
+			break;
+		case 'sent_messages_form':  
+                        module_load_include('inc', 'private_msg', 'private_msg_blockdata');
+			$block['subject'] = t('');
+			$block['content'] = private_msg_sent_messages_form();
+			break;
+		case 'search_messages_form':
+                        module_load_include('inc', 'private_msg', 'private_msg_blockdata');
+			$block['subject'] = t('');
+			$block['content'] = private_msg_search_messages_form();
+			break;
+           }
+          
+	return $block;          
+}
+
+
+
+
+/**
+ * autocomplete helper
+ * $string = string for search
+ */
+function _users_autocomplete($string) {
+    global $user;
+    $matches = array();
+
+  if ($string) {
+    $items = array_map('trim', explode(',', $string));
+    $last_item = array_pop($items);
+    $prefix = implode(', ', $items);
+
+    $result = db_select('realname')
+                ->fields('realname', array('uid'))
+                ->condition('realname', '%' . db_like($last_item) . '%', 'LIKE')
+                ->range(0, 10)
+                ->execute();
+    
+    foreach ($result as $users) {
+      if (!in_array($users->uid, $items)) {
+          
+         // $userdata = user_load_by_name($user->name);
+         
+          //======  Check contact status request approved or not ================//
+           $query = db_query("SELECT status FROM {message_contact_status} WHERE (sentd_uid=:sentd_uid AND rece_uid=:rece_uid) || (sentd_uid =:sentd_uid1 AND rece_uid=:rece_uid1)",array(":sentd_uid"=>$users->uid,":rece_uid"=>$user->uid,":sentd_uid1"=>$user->uid,"rece_uid1" => $users->uid))->fetchField();
+          
+          //==============  check friends are not -------------------------//
+           
+           $datauser = user_relationships_load(array("between" => array($users->uid, $user->uid)));
+           $datauser = array_shift($datauser);
+          if($query || !empty($datauser->approved)){
+               $userdata = user_load($users->uid);
+               
+        $value = !empty($prefix) ? $prefix . ', ' . check_plain(@$userdata->field_name_first['und'][0]['value'])." ".check_plain(@$userdata->field_name_last['und'][0]['value'])."(". check_plain($userdata->name).")" : check_plain(@$userdata->field_name_first['und'][0]['value'])." ".check_plain(@$userdata->field_name_last['und'][0]['value'])."(". check_plain($userdata->name).")";
+        
+        $matches[$value] = check_plain($value);
+          }
+       }
+    }
+  }
+$userdata = '';
+
+  drupal_json_output($matches);
+}
+
+//======================  Read Single messages on seperate page =============================//
+
+function private_msg_readpages($args,$args1){
+    global $base_url;
+    global $user;
+    $output = '';
+    if($args1 == 'sent'){
+        
+          $query = db_query("SELECT pmid.*,pmiu.recv_uidg   FROM {private_msg_inbox_data} pmid RIGHT JOIN {(select mid,group_concat(recv_uid) recv_uidg from private_msg_inbox_userdata group by mid)} as pmiu on pmid.mid = pmiu.mid Where pmid.mid=:mid and pmid.sent_uid=:sent_uid AND pmid.is_delete=:is_delete",array(":mid"=>$args,":sent_uid"=>$user->uid,":is_delete"=>0)); //return comma seperated value from second  tables. 
+      
+     $query1 = $query->fetchAll();
+     
+    if(count($query1)){
+       @$output  = "<div class='sent-message'>";                  
+       @$output .= "<h1>".$query1[0]->mess_subject."</h1>";
+       @$output1 = explode(",",$query1[0]->recv_uidg);
+        
+     for($i=0 ; $i<count($output1);$i++){
+          
+         @$output2 =  user_load($output1[$i]);
+         @$output3[$i] = (@$output2->field_name_first['und'][0]['value'])? l(check_plain(@$output2->field_name_first['und'][0]['value'])." ".check_plain(@$output2->field_name_last['und'][0]['value']),"user/".@$output2->uid):l(check_plain(@$output2->name),"user/".@$output2->uid);
+         
+        }
+         @$output .= "<div class='sender-info-main'>";
+        @$output .= "<div class='sender-info'>To :- ".implode(", ",@$output3)."</div>";
+        @$output .= "<div class='sentmessages'>".$query1[0]->messages."</div>";
+        if(@$query1[0]->mess_file){
+          @$output .= "<div class='inboxAttachments'> Download :- ".l(strchr($query1[0]->mess_file,"://"),  file_create_url($query1[0]->mess_file))."</div>";
+        }
+       @$output .= '<div class="delete-form"><form method="post" name="sentdelete" action="'.$base_url.'/user-inbox/send/'.$query1[0]->mid.'/sent"><input type="hidden" name="mid" value="'.$query1[0]->mid.'" /><input type="submit" name="submit" value="Delete"></form></div>';
+        @$output .= "</div>";
+        return @$output; 
+     }
+    else{
+        return "<h1>".t('kindly open a valid page')."</h1>";
+    }
+    
+ }
+ elseif ($args1 == 'inbox') {
+     
+     $query = db_query("SELECT pmid.*   FROM {private_msg_inbox_userdata} as pmiu JOIN  {private_msg_inbox_data} pmid on pmid.mid = pmiu.mid Where pmiu.mid=:mid and pmiu.recv_uid=:recv_uid AND pmiu.is_delete=:is_delete",array(":mid"=>$args,":recv_uid"=>$user->uid,":is_delete"=>0));
+     
+     $query1 = $query->fetchAll();
+     $output = '';
+    if(count($query1)){
+                        
+       @$output  = "<div class='inbox-message'>";                  
+       @$output .= "<h1>".$query1[0]->mess_subject."</h1>";
+            
+         @$output2 =  user_load($query1[0]->sent_uid);
+         @$output3 = (@$output2->field_name_first['und'][0]['value'])? l(check_plain(@$output2->field_name_first['und'][0]['value'])." ".check_plain(@$output2->field_name_last['und'][0]['value']),"user/".@$output2->uid):l(check_plain(@$output2->name),"user/".@$output2->uid);
+         
+          @$output .= "<div class='sender-info-main'>";
+        @$output .= "<div class='sender-info'>From :- ".@$output3."</div>";
+        @$output .= "<div class='inboxmessages'>".$query1[0]->messages."</div>";
+        if(@$query1[0]->mess_file){
+          @$output .= "<div class='inboxAttachments'> Download :- ".l(strchr($query1[0]->mess_file,"://"),  file_create_url($query1[0]->mess_file))."</div>";
+        }
+        
+        @$output .= '<div class="delete-form"><form method="post" name="inboxdelete" action="'.$base_url.'/user-inbox/send/'.$query1[0]->mid.'/inbox"><input type="hidden" name="mid" value="'.$query1[0]->mid.'" /><input type="submit" name="submit" value="Delete"></form></div>';
+                 @$output .= "</div>";
+        return @$output; 
+      }
+    else{
+        return "<h1>".t('kindly open a valid page')."</h1>";
+    }
+ }
+ elseif($args1 == 'draft'){
+  
+     $query = db_query("SELECT *   FROM {private_msg_inbox_data} Where mid=:mid and sent_uid=:sent_uid AND is_delete=:is_delete AND draft_users <> :draft_users",array(":mid"=>$args,":sent_uid"=>$user->uid,":is_delete"=>0,":draft_users"=>0));
+          
+     $query1 = $query->fetchAll();
+     $output = '';
+    if(count($query1)){
+                        
+       @$output  = "<div class='sent-message'>";                  
+       @$output .= "<h1>".$query1[0]->mess_subject."</h1>";
+       @$output1 = explode(",",$query1[0]->draft_users);
+        
+     for($i=0 ; $i<count($output1);$i++){
+          
+         @$output2 =  user_load($output1[$i]);
+         @$output3[] = (@$output2->field_name_first['und'][0]['value'])? l(check_plain(@$output2->field_name_first['und'][0]['value'])." ".check_plain(@$output2->field_name_last['und'][0]['value']),"user/".@$output2->uid):l(check_plain(@$output2->name),"user/".@$output2->uid);
+         
+        }
+        @$output .= "<div class='sender-info-main'>";
+        @$output .= "<div class='sender-info'>To :- ".implode(", ",@$output3)."</div>";
+        @$output .= "<div class='sentmessages'>".$query1[0]->messages."</div>";
+         if(@$query1[0]->mess_file){
+          @$output .= "<div class='inboxAttachments'> Download :- ".l(strchr($query1[0]->mess_file,"://"),  file_create_url($query1[0]->mess_file))."</div>";
+        }
+        
+        @$output .= '<div class="send-form"><form method="post" name="draftsend" action="'.$base_url.'/user-draft/send/'.$query1[0]->mid.'"><input type="hidden" name="mid" value="'.$query1[0]->mid.'" /><input type="submit" name="submit" value="Send"></form></div>';
+        
+        @$output .= '<div class="delete-form"><form method="post" name="draftdelete" action="'.$base_url.'/user-inbox/send/'.$query1[0]->mid.'/draft"><input type="hidden" name="mid" value="'.$query1[0]->mid.'" /><input type="submit" name="submit" value="Delete"></form></div>';
+                 @$output .= "</div>";
+        
+        return @$output; 
+      }
+    else{
+        return "<h1>".t('kindly open a valid page')."</h1>";
+    }
+    
+ } 
+ else{
+//     $query = db_select('private_msg_inbox_userdata', 'pmiu');
+//        $query->join('private_msg_inbox_data', 'pmid', 'pmiu.mid = pmid.mid');
+//        $query->fields('pmiu', array('mid'));
+//        $query->condition('pmiu.recv_uid',$user->uid,'=');
+//        $query->condition('pmiu.is_delete',0,'=');
+//        $query->extend('PagerDefault')
+//              ->limit(2);
+//       $result =   $query->execute();
+//       
+//         $header = array(
+//            array('data' => t('DFID')),
+//            array('data' => t('Format')),
+//            array('data' => t('Type')),
+//        );
+//         
+//        foreach ($result as $nid) {
+//           // print_r($nid);
+//            @$content[] =  array('data' => (array) $nid);
+//        
+//            
+//        }
+//        // add the content
+//        $build['pager_table'] = array(
+//            '#theme' => 'table', 
+//            '#header' => $header, 
+//            '#rows' => @$content, 
+//            '#empty' => t('There are no date formats found in the db'),
+//        );
+//            // echo "<pre>";
+//       $build['pager_pager'] = array('#theme' => 'pager');
+//       return $build;
+     return "<h1>".t('kindly open a valid page')."</h1>";
+ }
+      
+}
+
+function _private_msg_move_favorite_message($args){
+    global $user;
+    if($user->uid){
+        if ($_REQUEST['type'] == 'add_favorite') {
+            db_update('private_msg_inbox_userdata') // Table name no longer needs {}
+                    ->fields(array('mess_read' => 1))
+                    ->condition('mid', $args, '=')
+                    ->condition('recv_uid', $user->uid, '=')
+                    ->execute();
+            echo "confirm";
+        }
+        if ($_REQUEST['type'] == 'remove_favorite') {
+             db_update('private_msg_inbox_userdata') // Table name no longer needs {}
+                    ->fields(array('mess_read' => 0))
+                    ->condition('mid', $args, '=')
+                    ->condition('recv_uid', $user->uid, '=')
+                    ->execute();
+            echo "confirm";
+        }
+    }
+}

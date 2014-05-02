@@ -1,0 +1,148 @@
+<?php
+/*
+ *use hook_schema()
+ *  
+ */
+function private_msg_schema() {
+  $schema['private_msg_inbox_data'] = array(
+
+    'description' => 'The base table for Messaging.',
+    'fields' => array(
+      'mid' => array(
+        'description' => 'The primary identifier for a Messaging.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+       ),
+     
+      'sent_uid' => array(
+        'description' => 'Store Sent user information.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+       ),
+       
+     'is_delete' => array(
+        'description' => 'Store Sent user delete information.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+       ),
+    
+    'mess_subject' => array(
+        'description' => 'Store Subject of Messages',
+        'type' => 'varchar',
+        'length' => 255,
+        'default' => 0,
+      ),
+        
+     'messages' => array(
+        'description' => 'Store Messages infomations.',
+        'type' => 'text',
+      ),
+        
+      'mess_type' => array(
+        'description' => 'Describe the messages type 1=sent,2=Draft.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+        
+    'mess_file' => array(
+        'description' => 'Store attachment url info',
+        'type' => 'varchar',
+        'length' => 255,
+        'default' => 0,
+      ),
+        
+    'draft_users' => array(
+        'description' => 'Store the Draft users info',
+        'type' => 'varchar',
+        'length' => 255,
+        'default' => 0,
+      ),
+
+      'sent_date' => array(
+        'description' => 'Store the Sent Time info',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+        
+      'draft_date' => array(
+        'description' => 'Store the Draft Time info.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+          'primary key' => array('mid'),
+  );
+  
+ //=========== Second Table ===========================//
+  
+  $schema['private_msg_inbox_userdata'] = array(
+      
+    'fields' => array(
+       'id' => array(
+            'type' => 'serial',
+            'unsigned' => true,
+            'not null' => true,
+        ),
+       
+      'mid' => array(
+        'description' => 'Store Messages information.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+       ),
+       
+     'recv_uid' => array(
+        'description' => 'Store Recevie user information.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+       ),  
+       
+      'is_delete' => array(
+        'description' => 'Store Receive user delete information.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+       ),
+        
+     'mess_read' => array(
+        'description' => 'Describe the read/star messages status 1 = read,0= new.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),  
+         
+
+    ),
+    'foreign keys' => array(
+        'mid' => array(
+            'table' => 'private_msg_inbox_data',
+            'columns' => array('mid' => 'mid'),
+        ),
+    ),
+    'primary key' => array('id'),
+);
+  return $schema;
+}
+
+
+
+
+
+
+

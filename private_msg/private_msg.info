@@ -1,0 +1,5 @@
+name = private_msg
+description = Manage the Private Message system in this sites.
+core = 7.x
+package = Custom
+dependencies[] = realname
